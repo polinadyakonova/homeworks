@@ -20,17 +20,17 @@ if os.path.isfile('mybase.db'):
     os.remove('mybase.db')
 conn = sqlite3.connect('mybase.db')
 c = conn.cursor()
-c.execute("CREATE TABLE words(id text, Lemma text, Wordform text, Glosses text)") #первая таблица
+c.execute("CREATE TABLE words(id text, Lemma text, Wordform text, Glosses text)") #ГЇГҐГ°ГўГ Гї ГІГ ГЎГ«ГЁГ¶Г 
 for i in range (0, len(lemma)):
     c.execute("INSERT INTO words VALUES ('{}', '{}', '{}', '{}')".format('id' + str(i + 1) + 'w', lemma[i], wordform[i], glosses[i]))
 
-c.execute("CREATE TABLE glosses(id text, Abbreviation text, Meaning text)") #вторая таблица
+c.execute("CREATE TABLE glosses(id text, Abbreviation text, Meaning text)") #ГўГІГ®Г°Г Гї ГІГ ГЎГ«ГЁГ¶Г 
 abbreviation = ['ADJ', 'ADV', 'AUX', 'COMP', 'CONJ', 'CONN', 'DEM', 'INDEF', 'N', 'NEG', 'NUM', 'P', 'PART', 'POSS', 'PRON', 'PRV', 'PTCP', 'REL', 'Q', 'V', 'NOM', 'ACC', 'DAT', 'ABL', 'GEN', 'VOC', 'LOC', 'DAT-LOC', 'SG', '1SG', '2SG', '3SG', 'PL', '1PL', '2PL', '3PL', 'C', 'I', 'PST', 'MED', 'INF', 'IMF', 'IMP', 'PRS', 'PRT', 'ENLC', 'EMPH', 'INSTR', 'IMPF', 'ENCL', 'PERS']
 meaning = ['adjective', 'adverb', 'auxiliary', 'complementizer', 'conjunction', 'connective', 'demonstrative pronoun', 'indefinite pronoun', 'noun', 'negative', 'cardinal', 'preposition (postposition)', 'particle', 'possessive pronoun', 'pronoun', 'preverb', 'participle', 'relative pronoun', 'question word', 'verb', 'Nominative', 'Accusative', 'Dative', 'Ablative', 'Genitive', 'Vocative', 'Locative', 'Dat-Loc', 'SG', '1SG', '2SG', '3SG', 'PL', '1PL', '2PL', '3PL', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-']
 for i in range (0, len(abbreviation)):
     c.execute("INSERT INTO glosses VALUES ('{}', '{}', '{}')".format('id' + str(i + 1) + 'g', abbreviation[i], meaning[i]))
 
-c.execute("CREATE TABLE w_to_g(Word text,  Glosses text)") #третья таблица
+c.execute("CREATE TABLE w_to_g(Word text,  Glosses text)") #ГІГ°ГҐГІГјГї ГІГ ГЎГ«ГЁГ¶Г 
 gl = []
 for i in range(0, len(glosses)):
     a = glosses[i].find('.')
@@ -45,10 +45,10 @@ for i in range(0, len(glosses)):
                 c.execute("SELECT id FROM glosses WHERE Abbreviation = '{}'".format(arr[j]))
                 m = str(c.fetchall())[3:-4]
                 c.execute("INSERT INTO w_to_g VALUES ('{}', '{}')".format('id' + str(i + 1) + 'w', m))
-gl = set(gl)#множество всех глосс
+gl = set(gl)#Г¬Г­Г®Г¦ГҐГ±ГІГўГ® ГўГ±ГҐГµ ГЈГ«Г®Г±Г±
 
 X = [] 
-Y = [] #сколько штук каждой глоссы
+Y = [] #Г±ГЄГ®Г«ГјГЄГ® ГёГІГіГЄ ГЄГ Г¦Г¤Г®Г© ГЈГ«Г®Г±Г±Г»
 for i in range(0, len(abbreviation)):
     c.execute("SELECT Word FROM w_to_g WHERE Glosses = '{}'".format('id' + str(i + 1) + 'g'))
     a = len(c.fetchall())
@@ -57,7 +57,7 @@ for i in range(0, len(abbreviation)):
         Y.append(a)
         X.append(i + 1)
         
-#по горизонтали id каждой глоссы, по вертикали - количество
+#ГЇГ® ГЈГ®Г°ГЁГ§Г®Г­ГІГ Г«ГЁ id ГЄГ Г¦Г¤Г®Г© ГЈГ«Г®Г±Г±Г», ГЇГ® ГўГҐГ°ГІГЁГЄГ Г«ГЁ - ГЄГ®Г«ГЁГ·ГҐГ±ГІГўГ®
 plt.subplot(131)        
 plt.bar(X, Y)
 plt.title('all')
