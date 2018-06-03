@@ -1,0 +1,42 @@
+import sys, gensim
+import networkx as nx
+import matplotlib.pyplot as plt
+from operator import itemgetter
+words = "собака_NOUN пес_NOUN такса_NOUN бульдог_NOUN терьер_NOUN лапа_NOUN хвост_NOUN корм_NOUN миска_NOUN ошейник_NOUN поводок_NOUN порода_NOUN будка_NOUN конура_NOUN шавка_NOUN овчарка_NOUN сенбернар_NOUN бездомный_ADJ бешеный_ADJ домашний_ADJ служебный_ADJ сторожевой_ADJ зоомагазин_NOUN питомник_NOUN приют_NOUN выставка_NOUN короткошерстный_ADJ длинношерстный_ADJ колли_NOUN мастиф_NOUN нюх_NOUN обоняние_NOUN поводырь_NOUN морда_NOUN мех_NOUN кошка_NOUN дворняга_NOUN".split(' ')
+
+model = gensim.models.KeyedVectors.load_word2vec_format("ruwikiruscorpora_upos_skipgram_300_2_2018.vec", binary=False)
+model.init_sims(replace=True)
+
+matrix = [0 for i in range(0, len(words))]
+for i in range(0, len(words)):
+    matrix[i] = [0 for k in range(0, len(words))]
+    for j in range(i + 1, len(words)):
+        matrix[i][j] = model.similarity(words[i], words[j])
+
+G = nx.Graph()
+G.add_nodes_from(words)
+for i in range(0, len(words)):
+    for j in range(i + 1, len(words)):
+        if matrix[i][j] > 0.5:
+            G.add_edge(words[i], words[j])
+
+pos=nx.spring_layout(G)            
+nx.draw_networkx_nodes(G, pos, node_color='green', node_size=10) 
+nx.draw_networkx_edges(G, pos, edge_color='black')
+nx.draw_networkx_labels(G, pos, font_size=20, font_family='Arial')
+plt.axis('off') 
+plt.show()
+
+print("Всего компонент связности: " + str(nx.number_connected_components(G)))
+
+a = ""
+graphs = list(nx.connected_component_subgraphs(G))
+for i in range(0, len(graphs)):
+    a += " " + str(nx.radius(graphs[i]))
+
+print("Радиусы каждой из компонент:" + a)
+print("Коэффициент ассортативности: " + str(nx.degree_pearson_correlation_coefficient(G)))
+
+print("Центральные слова:")
+for i in (sorted(nx.degree_centrality(G).items(), key = itemgetter(1), reverse = True))[0:5]:
+    print(i)
